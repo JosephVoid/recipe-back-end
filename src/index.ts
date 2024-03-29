@@ -11,7 +11,7 @@ const ObjectId = require("mongoose").Types.ObjectId;
 
 const app = express();
 dotenv.config();
-app.use(cors());
+app.use(cors({ credentials: true, origin: "http://localhost:3000" }));
 app.use(bodyParser.json());
 app.use(cookieParser());
 
@@ -50,14 +50,14 @@ app.post("/sign-up", async (req, res) => {
 
 app.post("/sign-out", (req, res) => {
   res.clearCookie("user_id");
-  return res.send("Cookie deleted");
+  return res.status(200).send("Cookie deleted");
 });
 
 app.post("/create-recipe", async (req, res) => {
   try {
     const body = req.body;
     const cookie = req.cookies.user_id;
-    if (!cookie) return res.status(401).send("Unauthorized");
+    // if (!cookie) return res.status(401).send("Unauthorized");
     const recipe = await Recipe.create({
       _id: new ObjectId(),
       title: body.title,

@@ -25,7 +25,7 @@ const recipe_1 = __importDefault(require("../models/recipe"));
 const ObjectId = require("mongoose").Types.ObjectId;
 const app = (0, express_1.default)();
 dotenv_1.default.config();
-app.use((0, cors_1.default)());
+app.use((0, cors_1.default)({ credentials: true, origin: "http://localhost:3000" }));
 app.use(body_parser_1.default.json());
 app.use((0, cookie_parser_1.default)());
 mongoose_1.default
@@ -57,12 +57,15 @@ app.post("/sign-up", (req, res) => __awaiter(void 0, void 0, void 0, function* (
     res.cookie("user_id", user === null || user === void 0 ? void 0 : user._id, { maxAge: 24 * 60 * 60 * 1000 });
     return res.json(user);
 }));
+app.post("/sign-out", (req, res) => {
+    res.clearCookie("user_id");
+    return res.status(200).send("Cookie deleted");
+});
 app.post("/create-recipe", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const body = req.body;
         const cookie = req.cookies.user_id;
-        if (!cookie)
-            return res.status(401).send("Unauthorized");
+        // if (!cookie) return res.status(401).send("Unauthorized");
         const recipe = yield recipe_1.default.create({
             _id: new ObjectId(),
             title: body.title,
@@ -77,12 +80,21 @@ app.post("/create-recipe", (req, res) => __awaiter(void 0, void 0, void 0, funct
         return res.status(500).send("Error");
     }
 }));
-app.patch("/edit-recipe/:id", (req, res) => {
+app.patch("/edit-recipe/:id", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const body = req.body;
     const recipeId = req.params.id;
     const cookie = req.cookies.user_id;
-    return res.send("Live");
-});
+    if (!cookie)
+        return res.status(401).send("Unauthorized");
+    const recipe = yield recipe_1.default.updateOne({ _id: recipeId }, {
+        title: body.title,
+        author: body.author,
+        desc: body.desc,
+        img: body.img,
+        ingr: body.ingr,
+    });
+    return res.status(200).json(recipe);
+}));
 app.delete("/delete-recipe/:id", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const recipeId = req.params.id;
