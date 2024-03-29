@@ -48,6 +48,11 @@ app.post("/sign-up", async (req, res) => {
   return res.json(user);
 });
 
+app.post("/sign-out", (req, res) => {
+  res.clearCookie("user_id");
+  return res.send("Cookie deleted");
+});
+
 app.post("/create-recipe", async (req, res) => {
   try {
     const body = req.body;
@@ -68,12 +73,22 @@ app.post("/create-recipe", async (req, res) => {
   }
 });
 
-app.patch("/edit-recipe/:id", (req, res) => {
+app.patch("/edit-recipe/:id", async (req, res) => {
   const body = req.body;
   const recipeId = req.params.id;
   const cookie = req.cookies.user_id;
-
-  return res.send("Live");
+  if (!cookie) return res.status(401).send("Unauthorized");
+  const recipe = await Recipe.updateOne(
+    { _id: recipeId },
+    {
+      title: body.title,
+      author: body.author,
+      desc: body.desc,
+      img: body.img,
+      ingr: body.ingr,
+    }
+  );
+  return res.status(200).json(recipe);
 });
 
 app.delete("/delete-recipe/:id", async (req, res) => {
