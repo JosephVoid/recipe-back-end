@@ -65,11 +65,13 @@ app.post("/create-recipe", (req, res) => __awaiter(void 0, void 0, void 0, funct
     try {
         const body = req.body;
         const cookie = req.cookies.user_id;
-        // if (!cookie) return res.status(401).send("Unauthorized");
+        if (!cookie)
+            return res.status(401).send("Unauthorized");
         const recipe = yield recipe_1.default.create({
             _id: new ObjectId(),
             title: body.title,
             author: body.author,
+            author_id: body.author_id,
             desc: body.desc,
             img: body.img,
             ingr: body.ingr,

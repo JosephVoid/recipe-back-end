@@ -19,6 +19,7 @@ const recipeSchema = new mongoose_1.default.Schema({
     desc: { type: String, required: true },
     img: { type: String, required: false },
     author: { type: String, required: true },
+    author_id: { type: String, required: true },
     ingr: [ingrSchema],
 });
 exports.default = mongoose_1.default.model("recipe", recipeSchema);

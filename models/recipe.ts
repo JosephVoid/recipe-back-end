@@ -16,6 +16,7 @@ const recipeSchema = new mongoose.Schema({
   desc: { type: String, required: true },
   img: { type: String, required: false },
   author: { type: String, required: true },
+  author_id: { type: String, required: true },
   ingr: [ingrSchema],
 });
 
